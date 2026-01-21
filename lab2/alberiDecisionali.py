@@ -61,8 +61,8 @@ print("\nCount per bin:")
 print(df_group['status'].value_counts(dropna=False))
 
 #definizione degli assi x e y 
-X = df_group[features] #????
-y = df_group['status'] #????
+X = df_group[features] #contiene le colonne/features numeriche selezionate per predire il target
+y = df_group['status'] #contiene la colonna target "status" da predire
 
 # Split dataset
 #divide il dataset con il 70% per il training e il 30% per il test
@@ -98,16 +98,16 @@ y_pred_group = model_group.predict(X_test_scaled_group) #predice le classi del t
 print("\nModel Performance:")
 print(f"Accuracy: {accuracy_score(y_test_group, y_pred_group):.2f}")
 
-print((636231+324939)/1000000) #?????
+print((636231+324939)/1000000) #calcola la percentuale di dati in due categorie specifiche sul totale di un milione di righe (numeri presi a mano dall'output precedente
 
-print("Features used:", X.columns.tolist()) #?????
+print("Features used:", X.columns.tolist()) #passa a plot_tree i nomi delle features da mostrare nei nodi dell'albero
 
 #GRAFICO
 plt.figure(figsize=(20, 10)) 
 plot_tree(
     model_group,
     max_depth=2, #mostra i primi 2 livelli dell'albero
-    feature_names=X.columns, #????
+    feature_names=X.columns, #indica al plot_tree quali sono i nomi delle feature da mostrare nei nodi nell'albero
     class_names=[str(cls) for cls in sorted(y.unique())],
     filled=True, #colora i nodi in base alla classe predominante
     rounded=True, #stonda i bordi
