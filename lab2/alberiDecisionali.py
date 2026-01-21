@@ -21,8 +21,9 @@ if not os.path.exists(file_path):
 # Load dataset (first 1,000,000 rows for testing)
 df = pd.read_csv(file_path, low_memory=False, na_values=['-', 'NA','ND', 'n/a', ''], nrows=1000000)
 
-df = df.dropna(axis=1, how='all')
-df.dropna(subset='status', inplace=True)
+#pulizia dei dati
+df = df.dropna(axis=1, how='all') #rimuove colonne completamente vuote
+df.dropna(subset='status', inplace=True) #rimuove righe in cui la colonna status è vuota
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
