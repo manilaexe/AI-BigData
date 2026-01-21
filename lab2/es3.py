@@ -108,4 +108,8 @@ plt.grid(True)
 # Show the plot
 plt.show()
 
+#Plot Comment: max_depth vs test_size:
+
+#This plot shows the average accuracy values obtained for different combinations of max_depth (maximum tree depth) and test_size (portion of data reserved for testing).
+#Accuracy increases quickly up to depth 3, then stabilizes or fluctuates slightly.
 
