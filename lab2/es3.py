@@ -87,3 +87,25 @@ for test_size in test_sizes:
    # Append accuracy_list in accuracy_list_list
     accuracy_list_list.append(accuracy_list)
 
+# Create the plot
+x_axis=list(range(min_depth, max_depth))
+colors=["yellow", "red", "green", "blue", "black", "brown", "purple"]
+
+plt.figure(figsize=(10,6)) 
+
+# Add to plot all the  entries in accuracy_list_list
+for i, acc_list in enumerate(accuracy_list_list):
+    plt.plot(x_axis, acc_list, color=colors[i % len(colors)],
+             label=f"test_size={size_list[i]:.2f}", linewidth=2)
+
+# Personalize the plot
+plt.xlabel("Tree Depth (max_depth)")
+plt.ylabel("Accuracy")
+plt.title("Accuracy vs Depth for Different Test Set Sizes")
+plt.legend()
+plt.grid(True)
+
+# Show the plot
+plt.show()
+
+
