@@ -1,4 +1,47 @@
+#Build and analyse the tree considering the original dataset, considering all the 6 classes.
+import os
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.tree import DecisionTreeClassifier, plot_tree
+from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay
+
+from google.colab import drive
+drive.mount('/content/drive')
+
+cwd = 'drive/MyDrive/Colab Notebooks'  
+
+file_path = cwd + '/air_quality.csv'
+if not os.path.exists(file_path):
+    raise FileNotFoundError(f"CSV non trovato in: {file_path}")
+
+df = pd.read_csv(file_path, low_memory=False, na_values=['-', 'NA', 'ND', 'n/a', ''],nrows=1_000_000)
+
+df = df.dropna(axis=1, how='all') # Rimuove colonne completamente vuote
+
+df.dropna(subset=['status'], inplace=True)# Rimuove righe senza target
+
+df['date'] = pd.to_datetime(df['date'], errors='coerce') # Conversione della data
+
+df['year'] = df['date'].dt.year # Estrazione dell'anno come feature numerica
+
+# Feature numeriche
+features = [
+    'pm2.5', 'pm10',
+    'co', 'co_8hr',
+    'no2', 'nox', 'no',
+    'so2',
+    'o3',
+    'windspeed', 'winddirec',
+    'year', 'longitude', 'latitude'
+]
+
+
+print("\nDistribuzione classi originali (6 classi):")
+print(df['status'].value_counts(dropna=False))
 
 #---INIZIO ESERCIZIO---
 
