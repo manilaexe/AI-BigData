@@ -40,7 +40,7 @@ features = [
     'windspeed', 'winddirec',
     'year', 'longitude', 'latitude'
 ] #feature numeriche per predire status
-#tolte pm2.5_avg e pm1-_avg per avitare target leakage (sono troppo correlati con l'output)
+#tolte pm2.5_avg e pm10_avg per avitare target leakage (sono troppo correlati con l'output)
 # Removed pm2.5_avg, pm10_avg --> features were too correlated with the target (remember Notebook 1) --> "target leakage"
 
 print("\nCount per bin:") 
@@ -78,6 +78,7 @@ scaler = StandardScaler()
 X_train_scaled_group = scaler.fit_transform(X_train_group)  # fit computes parameters (mean μ and std σ) only on training data
 X_test_scaled_group  = scaler.transform(X_test_group)       # apply the μ and σ computed from training set
 
+#La standardizzazione non altera la dimensionalità del dataset, ma rende le feature confrontabili tra loro, migliorando la stabilità del modello.
 print("\nTraining set shape:", X_train_group.shape)
 print("Testing set shape: ", X_test_group.shape)
 print("Shapes after scaling:", X_train_scaled_group.shape, X_test_scaled_group.shape)
