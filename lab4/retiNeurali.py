@@ -1,4 +1,4 @@
-# Import of libraries
+#import librerie
 import os
 import pandas as pd
 import numpy as np
@@ -27,8 +27,7 @@ import os
 from google.colab import drive
 drive.mount('/content/drive')
 
-cwd = 'drive/MyDrive/Colab Notebooks' # Set your current working directory where the csv file is located
-
+cwd = 'drive/MyDrive/Colab Notebooks' 
 # Check if file exists
 file_path = cwd + '/air_quality.csv'
 if not os.path.exists(file_path):
@@ -47,8 +46,8 @@ target = "status"
 df = df.dropna(subset=[target])
 
 print("\nUnique values in the 'status' column after initial loading:")
-class_names = df['status'].unique()
-num_classes=len(df['status'].unique())
+class_names = df['status'].unique() #estrei i nomi delle classi
+num_classes=len(df['status'].unique()) #conta quante classi diverse ci sono 
 print(class_names)
 print("\nNumber of classes:", num_classes)
 
@@ -57,24 +56,20 @@ df.head()
 
 # Removing columns that are either non-numeric or not useful for prediction
 columns_to_drop = ["sitename", "county","aqi","unit","siteid","pollutant","date"]
-df = df.drop(columns=columns_to_drop, errors='ignore')
+df = df.drop(columns=columns_to_drop, errors='ignore') #errors serve per evitare crash se una colonna non esiste 
 
-# Handling potential infinite values
-df.replace([np.inf, -np.inf], np.nan, inplace=True)
+df.replace([np.inf, -np.inf], np.nan, inplace=True) #sostituisce valori infiniti con Nan
 
-# Drop columns with null values
-df = df.dropna(axis=1, how='all')
+df = df.dropna(axis=1, how='all') #elimina colonne completamente vuote
 
 # Let's select only the numeric columns from the dataframe and remove the target column from them
-num_cols = df.select_dtypes(include=np.number).columns.tolist()
+num_cols = df.select_dtypes(include=np.number).columns.tolist() #seleziona solo le colonne numeriche
 if target in num_cols:
-    num_cols.remove(target)
+    num_cols.remove(target) #rimuove il target dalle features
 
-# Drop rows with NaN values only in the numeric features
-df = df.dropna(subset=num_cols, how='any')
+df = df.dropna(subset=num_cols, how='any') #rimuove le righe con valori mancanti nelle feature numeriche
 
-# Define the feature schema before splitting the data
-feature_cols = num_cols.copy()
+feature_cols = num_cols.copy() #salva l'elenco finale delle features
 
 # Print checks
 print(df.info())
@@ -86,29 +81,29 @@ print(df[target].value_counts().sort_index())
 print("\nDimensions after cleaning:", df.shape)
 
 # Definition of fractions for training and validation
-test_frac = 0.2
-val_frac = 0.1
+test_frac = 0.2 #20% test
+val_frac = 0.1 #10% validation dal training 
 
-# First split: train/test
+# primo split tain/test
 train_df, test_df = train_test_split(
     df, # Here we do not create X and y like in previous notebooks, just to see a differrent workflow
     test_size=test_frac,
     random_state=42
 )
 
-# Second split: within the training set, we also separate the validation set
+# Secondo split: training e validation 
 train_df, val_df = train_test_split(
     train_df,
     test_size=val_frac,
     random_state=42
 )
 
-# Check of the classes present in the different sets
+#controlla che tutte le classi siano presenti nei set
 all_classes = set(np.unique(df[target]))
 train_classes = set(np.unique(train_df[target]))
 test_classes  = set(np.unique(test_df[target]))
 
-# Check for missing classes
+#controlla le classi mancanti
 missing_train = all_classes - train_classes
 missing_test  = all_classes - test_classes
 
@@ -119,29 +114,31 @@ print("Missing classes in test:", missing_test)
 print("Classes present in the train_df:", sorted(train_df[target].unique()))
 print("Classes present in test_df:", sorted(test_df[target].unique()))
 
-# Convert the DataFrames into NumPy arrays
+#converte i dataset in array di numeri NumPy
 X_train = train_df[feature_cols].values
 X_val   = val_df[feature_cols].values
 X_test  = test_df[feature_cols].values
 
-# Extract the target as a NumPy array of integers
+#estrae il target come array di NumPy di integers
 y_train = train_df[target]
 y_val   = val_df[target]
 y_test  = test_df[target]
 
 # Numeric encoding
-encoder = LabelEncoder()
+encoder = LabelEncoder() #impara la mappatura della classe
 encoder.fit(y_train)
-y_train_idx = encoder.transform(y_train)
-y_val_idx   = encoder.transform(y_val)
+#trasforma le classi testuali in interi
+y_train_idx = encoder.transform(y_train) 
+y_val_idx   = encoder.transform(y_val) 
 y_test_idx  = encoder.transform(y_test)
 
-# One-hot encoding
+# One-hot encoding necessario per categorical_crossentropy
 y_train_oh = to_categorical(y_train_idx, num_classes=num_classes)
 y_val_oh   = to_categorical(y_val_idx,   num_classes=num_classes)
 y_test_oh = to_categorical(y_test_idx, num_classes=num_classes)
 
 # Standardization: Bring all features to the same scale (mean = 0, std = 1) to stabilize training.
+#calcola media e deviazione solo sul training, applica la stessa trasformazione a validation e test, evita leakage
 scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_val   = scaler.transform(X_val)
@@ -151,37 +148,38 @@ X_test  = scaler.transform(X_test)
 print("Training set dimensions:", X_train.shape)
 print("Test set dimensions:", X_test.shape)
 
-# Define the model
+#DEFINIZIONE DEL MODELLO numero di neuroni=numero di features
 model = keras.Sequential([
     layers.Input(shape=(X_train.shape[1],)),
     layers.Dense(16, activation="relu"),
     layers.Dense(8, activation="relu"),
     layers.Dense(num_classes, activation="softmax")
 ])
-# Model filling
+
+#COMPILAZIONE DEL MODELLO
 model.compile(
-    optimizer=optimizers.Adam(learning_rate=1e-3),
-    loss="categorical_crossentropy",
-    metrics=["accuracy"]
+    optimizer=optimizers.Adam(learning_rate=1e-3), #ottimizzazione
+    loss="categorical_crossentropy", #classificazione multiclasse
+    metrics=["accuracy"] #accuracy come metrica
 )
 
-# Model training
-history = model.fit(
+#TRAINING
+history = model.fit( #addestra la rete, hystory salva l'andamento di loss e accuracy
     X_train, y_train_oh,
-    validation_data=(X_val, y_val_oh),
+    validation_data=(X_val, y_val_oh), #per monitorare overfitting
     epochs=50,
     batch_size=128,
     verbose=1
 )
 
-# Model evaluation on the test set
-loss, acc = model.evaluate(X_test, y_test_oh, verbose=0)
+#VALUTAZIONE
+loss, acc = model.evaluate(X_test, y_test_oh, verbose=0) #valuta su dati mai visti
 print(f"Test Accuracy: {acc:.4f}")
 
 # Predictions on the test set
 y_pred = model.predict(X_test, verbose=0).argmax(axis=1)
 
-# Confusion matrix
+#MATRICE DI CONFUSIONE
 cm = confusion_matrix(y_test_idx, y_pred, normalize="true")
 plt.figure(figsize=(10,8))
 
