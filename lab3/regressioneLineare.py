@@ -83,13 +83,18 @@ plt.legend()
 plt.grid(alpha=0.3)
 plt.show()
 
-from sklearn.preprocessing import PolynomialFeatures
-from sklearn.pipeline import make_pipeline
+
+
+
+
 
 
 
 
 #REGRESSIONE POLINOMIALE NON LA CHIEDE ALL'ESAME
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.pipeline import make_pipeline
+
 poly_model = make_pipeline(
     PolynomialFeatures(degree=2, include_bias=False),
     LinearRegression()
