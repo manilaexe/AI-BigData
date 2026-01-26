@@ -9,16 +9,21 @@ Il quinto blocco avrà la parte aggiuntiva della rete neurale fatta apposta per 
     
 """
 Spiegazione per capire quale algoritmo usare:
-1)Guardare richiesta esercizio e vedere su cosa vuole il prof target; se questo è object allora abbiamo due possibilità:
+1)Guardare richiesta esercizio e vedere su cosa vuole il prof target; se questo è object allora abbiamo due 
+possibilità:
     -Prima: Il csv è piccolo? Allora bisogna usare l'albero
-    -Seconda: Il csv è grande(migliaia o milioni di righe)? Allora puoi o fare l'albero e poi implementare sotto la rete neurale(in questo esercizio lo faccio) o fare quello(non hai altre possibilità)
+    -Seconda: Il csv è grande(migliaia o milioni di righe)? Allora puoi o fare l'albero e poi implementare 
+    sotto la rete neurale(in questo esercizio lo faccio) o fare quello(non hai altre possibilità)
 
-2)Il target è di tipo int o float(numerico): usare la regressione lineare e se il csv è grande applicare la rete neurale(nel dubbio fare sempre)
+2)Il target è di tipo int o float(numerico): usare la regressione lineare e se il csv è grande applicare la
+rete neurale(nel dubbio fare sempre)
 
-3)Il clustering(un qualcosa uscito dall'inferno): Usare quando(penso) il prof chiede di voler dividere le variabili in più gruppi e si usa QUANDO NON HAI UN TARGET
+3)Il clustering(un qualcosa uscito dall'inferno): Usare quando(penso) il prof chiede di voler dividere le 
+variabili in più gruppi e si usa QUANDO NON HAI UN TARGET
 """
 
-#Questi sono i 5 import che vanno sempre messi in qualsiasi caso, per impararli ho usato una regola speciale: la regola della MNOP S, imparo la prima lettera così che visual studio me la completa da solo
+#Questi sono i 5 import che vanno sempre messi in qualsiasi caso, per impararli ho usato una regola speciale: la 
+#regola della MNOP S, imparo la prima lettera così che visual studio me la completa da solo
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -28,7 +33,8 @@ import seaborn as sns
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 
-#La prima cosa da fare SEMPRE è creare un file_path e l'if per vedere se esiste, poi fare il read_csv e controllare che tipologia di dati sono presenti nel dataset
+#La prima cosa da fare SEMPRE è creare un file_path e l'if per vedere se esiste, poi fare il read_csv e controllare 
+#che tipologia di dati sono presenti nel dataset
 
 file_path = "data/drug200.csv"
 #controllo se esiste il file_path con il csv, in caso non esista darà errore
@@ -37,17 +43,21 @@ if not os.path.exists(file_path):
 #read_csv serve per leggere il csv(autoesplicativo)
 df = pd.read_csv(file_path, low_memory=False, na_values=["NA", "ND", "NaN", "", "-"])
 
-df.info()#consiglio: quando inizi l'esame bisogna vedere i dati all'interno del dataset e quindi con df.info() vedi il tipo dei dati e con df.info vedrai che tipo di dati ci sono
+df.info()#consiglio: quando inizi l'esame bisogna vedere i dati all'interno del dataset e quindi con df.info() vedi 
+#il tipo dei dati e con df.info vedrai che tipo di dati ci sono
 
-print(df.isnull().sum().tolist())#con questa riga vedi quanti nulli ci sono e in caso di righe o colonne vuote fare gli eventuali comandi
+print(df.isnull().sum().tolist())#con questa riga vedi quanti nulli ci sono e in caso di righe o colonne vuote fare 
+#gli eventuali comandi
 #1) elimina le colonne che ha TUTTE le righe vuote
-#2) elimina le righe vuote della colonna Drug(il target), lo fai solo di questo perché se lo facessi di tutte elimineresti delle righe di Drug che è la colonna principale
+#2) elimina le righe vuote della colonna Drug(il target), lo fai solo di questo perché se lo facessi di tutte 
+#elimineresti delle righe di Drug che è la colonna principale
 #In questo caso vedendo che non ci sono righe vuote puoi anche non farle queste due righe, ma è buona norma farlo
 df = df.dropna(axis=1, how="all")
 df = df.dropna(how="any", subset="Drug")
 
 target = df["Drug"]#creare ssempre target della roba che vuole il prof
-#Serve per trasformare gli object in numerici, bisogna farlo sempre per tutti e se farlo sul target dipende dall'algoritmo utilizzato
+#Serve per trasformare gli object in numerici, bisogna farlo sempre per tutti e se farlo sul target dipende 
+#dall'algoritmo utilizzato
 label = LabelEncoder()
 df["Sex"] = label.fit_transform(df["Sex"])
 df["BP"] = label.fit_transform(df["BP"])
@@ -58,7 +68,8 @@ num_cols = df.select_dtypes(include=[np.number]).columns.tolist()#num_cols ti da
 X = df[num_cols]
 y = df[target]
 X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.3, random_state=42)
-#Questo dovrebbe essere lo scheletro che è uguale per tutti ma sinceramente non so neanche se abbia senso fare uno scheletro? Anche perché alla fine sono piccole le cose che cambiano nei vari
+#Questo dovrebbe essere lo scheletro che è uguale per tutti ma sinceramente non so neanche se abbia senso fare 
+#uno scheletro? Anche perché alla fine sono piccole le cose che cambiano nei vari
 #algoritmi, solo albero e regressione
 
 #codice per regressione lineare
@@ -68,7 +79,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 
-#Questi sono gli import necessari per la regressione lineare, qui per impararli ho usato la tecnica speciale del PP MM L(per gli import dopo se non te li ricordi puoi selezionare es.preprocessing 
+#Questi sono gli import necessari per la regressione lineare, qui per impararli ho usato la tecnica speciale 
+#del PP MM L(per gli import dopo se non te li ricordi puoi selezionare es.preprocessing 
 #fare tasto destro e andare su Go definition, li ci sono tutte le possibilità di import e ti ricordi dopo)
 from sklearn.preprocessing import LabelEncoder, StandardScaler, PolynomialFeatures
 from sklearn.metrics import mean_squared_error, root_mean_squared_error
@@ -93,13 +105,15 @@ label = LabelEncoder()
 df["Sex"] = label.fit_transform(df["Sex"])
 df["BP"] = label.fit_transform(df["BP"])
 #....
-df[target] = label.fit_transform(df[target])#in questo caso trasformo anche il target in valore perché nella regressione lineare dovrebbe essere di base un numero
+df[target] = label.fit_transform(df[target])#in questo caso trasformo anche il target in valore perché nella 
+#regressione lineare dovrebbe essere di base un numero
 
 num_cols = df.select_dtypes(include=[np.number]).columns.tolist()
 
 cm = df[num_cols].corr()
 plt.figure(figsize=[10,10])
-sns.heatmap(cm, annot=True)#questa è la matrice di correlazione e mostra quanta correlazione c'è fra una variabile all'altra, la correlazione che tieni dipende, ma se vuoi un default puoi eliminare
+sns.heatmap(cm, annot=True)#questa è la matrice di correlazione e mostra quanta correlazione c'è fra una variabile 
+#all'altra, la correlazione che tieni dipende, ma se vuoi un default puoi eliminare
                            #tutti quelli sotto il -0.15/0.15
 plt.show()
 #qui poi eliminerai le colonne con poca correlazione
@@ -107,9 +121,11 @@ plt.show()
 X = df[num_cols]
 y = df[target]
 X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.3, random_state=42)
-#è importante capire cosa fa lo StadardScaler e lo spiegherò in davvero poche righe(per una migliore spiegazione chiedere a chat gpt): range circa -1 a 1; valore es.100000 = 1; valore es. 5= 0.5
+#è importante capire cosa fa lo StadardScaler e lo spiegherò in davvero poche righe(per una migliore 
+#spiegazione chiedere a chat gpt): range circa -1 a 1; valore es.100000 = 1; valore es. 5= 0.5
 scaler = StandardScaler()
-#qui facciamo prima fit e poi solo transform perché facendo fit tu crei un'etichetta e essendo che X_test ha gli stessi valori di X_train e quindi le stesse etichette metterò solo tranform, si
+#qui facciamo prima fit e poi solo transform perché facendo fit tu crei un'etichetta e essendo che X_test 
+#ha gli stessi valori di X_train e quindi le stesse etichette metterò solo tranform, si
 #usa quindi solo con valori uguali, sennò mettere sempre fit_transform
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
@@ -119,7 +135,8 @@ Metodo per imparare a memoria le variabili da mettere in queste righe sotto:
 fit = addestramento quindi metterò i train
 predict = vediamo quando è accurato il modello e quindi lo testiamo con X_test
 rmse = è l'accuratezza quindi giustamente confronti i test con le previsioni(pred)
-GRAFICI: se vedi lo scatter è uguale a quello che metti in rmse e plot è letteralmente solo y_test ripetuto 4 volte
+GRAFICI: se vedi lo scatter è uguale a quello che metti in rmse e plot è letteralmente solo y_test 
+ripetuto 4 volte
 """
 model = LinearRegression()
 model.fit(X_train_scaled, y_train)
@@ -134,8 +151,10 @@ plt.scatter(y_test, y_pred, alpha=0.6, color="purple")
 plt.plot([y_test.min(), y_test.max()],[y_test.min(), y_test.max()], color="red")
 plt.show()
 
-#se guardi bene il poly è una cazzata tremenda, l'unica cosa da imparare è la prima riga ed è fatta da make_pipeline(PolynomialFeatures(...), StandardScaler()) poi il resto è un copia incolla dal
-#model di sopra, il poly è un metodo per verificare se è più accurato, la differenza con la regressione lineare è che la regressione ha una linea retta, invece il poly ha una linea curva
+#se guardi bene il poly è una cazzata tremenda, l'unica cosa da imparare è la prima riga ed è fatta 
+#da make_pipeline(PolynomialFeatures(...), StandardScaler()) poi il resto è un copia incolla dal
+#model di sopra, il poly è un metodo per verificare se è più accurato, la differenza con la regressione 
+#lineare è che la regressione ha una linea retta, invece il poly ha una linea curva
 poly = make_pipeline(PolynomialFeatures(degree=3, include_bias=False), StandardScaler())
 poly.fit(X_train_scaled, y_train)
 y_pred_poly = poly.predict(X_test)
@@ -143,7 +162,8 @@ mse_poly = mean_squared_error(y_test, y_pred_poly)
 rmse_poly = root_mean_squared_error(y_test, y_pred_poly)
 print(f"L'accuratezza della regressione lineare è: {rmse_poly*100:.2f}")
 
-#Rete neurale regressione lineare, ancora non ho ben capito il codice sul perché si fa così, però abbiamo una libreria che da il prof chiamato tenserflow e aiuta molto perché la maggior parte
+#Rete neurale regressione lineare, ancora non ho ben capito il codice sul perché si fa così, però abbiamo 
+#una libreria che da il prof chiamato tenserflow e aiuta molto perché la maggior parte
 #dei metodi che usiamo sono presenti nella libreria
 import tensorflow as tf
 import keras
@@ -215,12 +235,15 @@ df = df.dropna(axis=1, how="all")
 df = df.dropna(how="any", subset="Drug")
 print(df.isnull().sum().tolist())
 
-# Questo ti crea un grafico e barre e ti dice se il dataset è sbilanciato(le barre sono diverse fra di loro(una molto più lunga e l'altra più corta)) o bilanciato(le barre sono tutte vicine fra di loro)
-#A QUANTO PARE QUESTO GRAFICO CHE TI ESCE SERVE SOLO PER FARE DA LECCACULO, serve per dire al prof che sai fare le cose: visto che il grafico è sbilanciato e con poche righe sai che devi fare l'albero
+# Questo ti crea un grafico e barre e ti dice se il dataset è sbilanciato(le barre sono diverse fra 
+#di loro(una molto più lunga e l'altra più corta)) o bilanciato(le barre sono tutte vicine fra di loro)
+#A QUANTO PARE QUESTO GRAFICO CHE TI ESCE SERVE SOLO PER FARE DA LECCACULO, serve per dire al prof che 
+#sai fare le cose: visto che il grafico è sbilanciato e con poche righe sai che devi fare l'albero
 df['Drug'].value_counts(normalize=True).plot(kind='bar')
 plt.show()
 
-#qui trasformi tutti gli object in int APPARTE PER IL TARGET CHE DEVI LASCIARLO OBJECT(con l'albero non devi trasformarlo), il motivo dovrebbe essere perché per l'addestramento della macchina 
+#qui trasformi tutti gli object in int APPARTE PER IL TARGET CHE DEVI LASCIARLO OBJECT(con l'albero 
+#non devi trasformarlo), il motivo dovrebbe essere perché per l'addestramento della macchina 
 #vuole tutti int
 label = LabelEncoder()
 df["Sex"] = label.fit_transform(df["Sex"])
@@ -237,7 +260,8 @@ X = df[num_cols]
 y = df[target]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
-#qui serve lo standard scaler tipo nella regressione lineare, nelle reti neurali e nel cluster, nell'albero decisionale è "facoltativo" ma è meglio se non lo metti così dimostri al prof che sei grande
+#qui serve lo standard scaler tipo nella regressione lineare, nelle reti neurali e nel cluster, nell'albero 
+#decisionale è "facoltativo" ma è meglio se non lo metti così dimostri al prof che sei grande
 #magari scrivendo un commento dicendo che nell'albero decisionale non serve mettere lo standard scaler
 #In questo blocco di codice crei l'albero, lo addesti e predici i valori così poi da vedere quanto è accurato il modello
 model = DecisionTreeClassifier(random_state=69, max_depth=4)
@@ -259,15 +283,19 @@ disp = ConfusionMatrixDisplay(cm, display_labels=classes)
 disp.plot(cmap="Blues")
 plt.show()
 
-#Con questo abbiamo TEORICAMENTE finito, ma al prof non va bene che finisca così, quindi bisogna fare più prove, quindi basta fare copia incolla del codice di prima e modificare es.MaxDepth = 3 al
-#posto di 4, nel train_test_split mettere 0.4 quindi 60% su X e un 40% su y, per commentare meglio vedere il file del prof che lo dice nel suo metodo soave;
-#qui nel grafico notiamo che confonde i dati fra drugC e drugX e tra DrugB e DrugY, quindi proviamo a fare diversi test per vedere cosa succede ai grafici e all'accuratezza
+#Con questo abbiamo TEORICAMENTE finito, ma al prof non va bene che finisca così, quindi bisogna fare più 
+#prove, quindi basta fare copia incolla del codice di prima e modificare es.MaxDepth = 3 al
+#posto di 4, nel train_test_split mettere 0.4 quindi 60% su X e un 40% su y, per commentare meglio vedere 
+#il file del prof che lo dice nel suo metodo soave;
+#qui nel grafico notiamo che confonde i dati fra drugC e drugX e tra DrugB e DrugY, quindi proviamo a fare 
+#diversi test per vedere cosa succede ai grafici e all'accuratezza
 
 #rete neurale per l'albero decisionale
 import tensorflow as tf
 import keras
 from keras import layers, optimizers
-#allora qui c'è da dire una coas importante, essendo che il target è un oggetto, la rete neurale vuole tutti valori e quindi dovremo trasformare target in numero e ricreare y perché prima aveva
+#allora qui c'è da dire una coas importante, essendo che il target è un oggetto, la rete neurale vuole tutti 
+#valori e quindi dovremo trasformare target in numero e ricreare y perché prima aveva
 #valore oggetto
 label = LabelEncoder()
 df[target] = label.fit_transform(df[target])
